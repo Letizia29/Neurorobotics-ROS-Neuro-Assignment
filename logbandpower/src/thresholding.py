@@ -73,7 +73,7 @@ def main():
 	
 			new_data = False
 	
-		rate.sleep()
+		#rate.sleep()
 		
 if __name__ == '__main__':
-  main()
+	main()
