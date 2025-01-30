@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+	<param name="rate" value="16" />
+	
+	<node name="bandpower_node" pkg="logbandpower" type="bandpower.py" output="screen" >
+		<param name="rate" value="framerate" />
+	</node>
+	
+	<node name="thresholding_node" pkg="logbandpower" type="thresholding.py" output="screen" >
+		<param name="channel" value="9" />
+		<param name="threshold" value="15" />
+	</node>	
+</launch>
+
+
+
+

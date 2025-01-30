@@ -44,7 +44,7 @@ def generate_neuroevent():
 
 
 def main():
-	global new_data, current_frame, ch, thr
+	global ch, thr
 	new_data = False
 
 	# Initialize the node
@@ -54,11 +54,11 @@ def main():
 	thr = rospy.get_param('threshold', 15) # threshold
 
 	# Initialize the publisher 
-	pub = rospy.Publisher('/event/bus', NeuroEvent, queue_size=1)
+	pub = rospy.Publisher('/events/bus', NeuroEvent, queue_size=1)
 	
 
 	# Setup the Subscriber
-	rospy.Subscriber('bandpower', NeuroFrame, callback)
+	rospy.Subscriber('eeg/bandpower', NeuroFrame, callback)
 	
 
 	while not rospy.is_shutdown():
@@ -67,7 +67,7 @@ def main():
 
 			# publish a NeuroEvent only if the threshold was reached	
 			if apply_threshold(current_frame) == 1:
-				# Publish in /event/bus
+				# Publish in /events/bus
 				event_msg = generate_neuroevent()
 				pub.publish(event_msg)
 	

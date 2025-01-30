@@ -48,17 +48,20 @@ def buffered_bandpower(data: NeuroFrame):
 
 def generate_new_message(data, rate, old_message):
 	# Starting from the old message generate the new one
-	new_msg = Float32MultiArray()
+	new_msg = NeuroFrame()
 
-	new_msg.layout.dim = [MultiArrayDimension()]
-	
-	new_msg.layout.dim[0].label = "height";
-	new_msg.layout.dim[0].size   = old_message.eeg.info.nchannels;
-	new_msg.layout.dim[0].stride = old_message.eeg.info.nchannels;
-	new_msg.layout.data_offset = 0;
+	# Populate the eeg.info with relevant information from old_message
+	new_msg.eeg.info.nsamples = len(data)
+	new_msg.eeg.info.nchannels = len(data)
+	new_msg.eeg.info.stride = len(data)
+	new_msg.eeg.info.unit = "uV"  # Assuming units are microvolts
+	new_msg.eeg.info.transducter = "Bandpower"
+	new_msg.eeg.info.prefiltering = "None"
+	new_msg.eeg.info.minmax = [min(data), max(data)]
+	new_msg.eeg.info.labels = ["eeg:{}".format(i+1) for i in range(len(data))]
 
-	# Pack the new data
-	new_msg.data = data
+	# Pack the bandpower data into the eeg.data field
+	new_msg.eeg.data = np.array(data, dtype=np.float32)
 
 	return new_msg
 
@@ -72,9 +75,9 @@ def main():
 	rospy.init_node('bandpower')
 	# Init the Publisher
 	hz = rospy.get_param('rate', 16) # data.sr / nsample
-	pub = rospy.Publisher('bandpower', Float32MultiArray, queue_size=1)
+	pub = rospy.Publisher('eeg/bandpower', NeuroFrame, queue_size=1)
 	# Setup the Subscriber
-	rospy.Subscriber('neurodata_filtered', NeuroFrame, callback)
+	rospy.Subscriber('eeg/filtered', NeuroFrame, callback)
 	rate = rospy.Rate(hz)
 
 	while not rospy.is_shutdown():
